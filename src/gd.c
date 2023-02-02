@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "utils.h"
 
-// Stochastic gradient descent
+// Gradient descent
 void dgd( unsigned long m, unsigned long n, double *X, double *y, double *coef, double *intercept, double eta, int max_iter, int fit_intercept )
 {
     double alpha = 1.0, beta = 0.0, gradient_intercept = 0.0, eta_m;
