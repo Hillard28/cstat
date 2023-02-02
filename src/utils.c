@@ -85,7 +85,7 @@ double dsigmoid( unsigned long n, double alpha, double *X, double *coef, double 
     //double z = intercept;
     //bli_ddotxv( BLIS_NO_CONJUGATE, BLIS_NO_CONJUGATE, n, &alpha, X, 1, coef, 1, &beta, &z );
     double z = dlc(n, X, coef, intercept);
-    if ( z >= 0)
+    if ( z >= 0 )
     {
       return 1.0 / (1.0 + exp(-z));
     }
