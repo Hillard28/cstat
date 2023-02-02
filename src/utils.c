@@ -8,35 +8,29 @@
 #define TEMPERING_MASK_B	0x9d2c5680
 #define TEMPERING_MASK_C	0xefc60000
 
+// set initial seeds to mt[STATE_VECTOR_LENGTH]
 inline static void m_seedRand(MTRand* rand, unsigned long seed) {
-  /* set initial seeds to mt[STATE_VECTOR_LENGTH] using the generator
-   * from Line 25 of Table 1 in: Donald Knuth, "The Art of Computer
-   * Programming," Vol. 2 (2nd Ed.) pp.102.
-   */
   rand->mt[0] = seed & 0xffffffff;
   for(rand->index=1; rand->index<STATE_VECTOR_LENGTH; rand->index++) {
     rand->mt[rand->index] = (6069 * rand->mt[rand->index-1]) & 0xffffffff;
   }
 }
 
-/**
-* Creates a new random number generator from a given seed.
-*/
+// Creates a new random number generator from a given seed.
 MTRand seedRand(unsigned long seed) {
   MTRand rand;
   m_seedRand(&rand, seed);
   return rand;
 }
 
-/**
- * Generates a pseudo-randomly generated long.
- */
+// Generates a pseudo-randomly generated long.
 unsigned long genRandLong(MTRand* rand) {
 
   unsigned long y;
-  static unsigned long mag[2] = {0x0, 0x9908b0df}; /* mag[x] = x * 0x9908b0df for x = 0,1 */
+  // mag[x] = x * 0x9908b0df for x = 0,1
+  static unsigned long mag[2] = {0x0, 0x9908b0df};
   if(rand->index >= STATE_VECTOR_LENGTH || rand->index < 0) {
-    /* generate STATE_VECTOR_LENGTH words at a time */
+    // generate STATE_VECTOR_LENGTH words at a time
     int kk;
     if(rand->index >= STATE_VECTOR_LENGTH+1 || rand->index < 0) {
       m_seedRand(rand, 4357);
@@ -61,9 +55,7 @@ unsigned long genRandLong(MTRand* rand) {
   return y;
 }
 
-/**
- * Generates a pseudo-randomly generated double in the range [0..1].
- */
+// Generates a pseudo-randomly generated double in the range [0..1].
 double genRand(MTRand* rand) {
   return((double)genRandLong(rand) / (unsigned long)0xffffffff);
 }
@@ -79,13 +71,18 @@ double dlc( unsigned long n, double *X, double *coef, double intercept )
     return z;
 }
 
-// Compute y_hat = 1 / (1 + e^(-z))
+// Compute y_hat = 1 / (1 + e^(-(w * x + b)))
 double dsigmoid( unsigned long n, double alpha, double *X, double *coef, double beta, double intercept )
 {
     //double z = intercept;
     //bli_ddotxv( BLIS_NO_CONJUGATE, BLIS_NO_CONJUGATE, n, &alpha, X, 1, coef, 1, &beta, &z );
-    double z = dlc(n, X, coef, intercept);
-    if ( z >= 0 )
+    double z = intercept;
+    for ( unsigned long j = 0; j < n; j++ )
+    {
+        z += X[j] * coef[j];
+    }
+
+    if ( z >= 0)
     {
       return 1.0 / (1.0 + exp(-z));
     }
