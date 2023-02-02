@@ -5,7 +5,7 @@
 // Stochastic gradient descent
 void dsgd( unsigned long m, unsigned long n, double *X, double *y, double *coef, double *intercept, double eta, int max_iter, int fit_intercept, int random_seed )
 {
-    double y_pred, resid;
+    double resid;
     unsigned long idx;
     MTRand seed;
     double alpha = 1.0, beta = 1.0;
@@ -37,8 +37,7 @@ void dsgd( unsigned long m, unsigned long n, double *X, double *y, double *coef,
             idx = genRandLong(&seed) % m;
             
             // Compute y_hat
-            y_pred = dsigmoid( n, alpha, &X[n*idx], coef, beta, *intercept );
-            resid = -(y[idx] - y_pred);
+            resid = -(y[idx] - dsigmoid( n, alpha, &X[n*idx], coef, beta, *intercept ));
             // Compute gradients and adjust weights
             for ( unsigned long i = 0; i < n; i++ )
             {
