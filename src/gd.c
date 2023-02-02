@@ -7,7 +7,6 @@ void dgd( unsigned long m, unsigned long n, double *X, double *y, double *coef, 
     double alpha = 1.0, beta = 0.0, gradient_intercept = 0.0;
     double eta_m = eta / (double)m;
 
-    double *y_pred = (double *) malloc (m * sizeof(double));
     double *resid = (double *) malloc (m * sizeof(double));
     double *gradient_coef = (double *) malloc (n * sizeof(double));
 
@@ -23,8 +22,7 @@ void dgd( unsigned long m, unsigned long n, double *X, double *y, double *coef, 
         // Compute y_hat and gradients
         for ( unsigned long i = 0; i < m; i++ )
         {
-            y_pred[i] = dsigmoid( n, alpha, &X[n*i], coef, beta, *intercept );
-            resid[i] = y[i] - y_pred[i];
+            resid[i] = y[i] - dsigmoid( n, alpha, &X[n*i], coef, beta, *intercept );
             for ( unsigned long j = 0; j < n; j++ )
             {
                 gradient_coef[j] -= (X[n*i + j] * resid[i]);
@@ -46,7 +44,6 @@ void dgd( unsigned long m, unsigned long n, double *X, double *y, double *coef, 
             gradient_intercept = 0.0;
         }
     }
-    free(y_pred);
     free(resid);
     free(gradient_coef);
 }
