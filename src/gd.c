@@ -4,7 +4,8 @@
 // Gradient descent
 void dgd( unsigned long m, unsigned long n, double *X, double *y, double *coef, double *intercept, double eta, int max_iter, int fit_intercept )
 {
-    double alpha = 1.0, beta = 0.0, gradient_intercept = 0.0, eta_m;
+    double alpha = 1.0, beta = 0.0, gradient_intercept = 0.0;
+    double eta_m = eta / (double)m;
 
     double *y_pred = (double *) malloc (m * sizeof(double));
     double *resid = (double *) malloc (m * sizeof(double));
@@ -16,8 +17,6 @@ void dgd( unsigned long m, unsigned long n, double *X, double *y, double *coef, 
         gradient_coef[j] = 0.0;
     }
     *intercept = 0.0;
-
-    eta_m = eta / (double)m;
     
     for ( int epoch = 0; epoch < max_iter; epoch++ )
     {
