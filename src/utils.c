@@ -60,11 +60,70 @@ double genRand(MTRand* rand) {
   return((double)genRandLong(rand) / (unsigned long)0xffffffff);
 }
 
+double dlcx4( size_t n, const double *X, const double *coef, double intercept )
+{
+  double s0 = intercept, s1 = 0.0, s2 = 0.0, s3 = 0.0;
+  if (n % 2)
+  {
+    for ( size_t j = (n >> 2); j > 0; j-- )
+    {
+      s0 += X[0] * coef[0];
+      s1 += X[1] * coef[1];
+      s2 += X[2] * coef[2];
+      s3 += X[3] * coef[3];
+      X += 4;
+      coef += 4;
+    }
+    return s0 + s1 + s2 + s3 + (X[0] * coef[0]);
+  }
+  else
+  {
+    for ( size_t j = (n >> 2); j > 0; j-- )
+    {
+      s0 += X[0] * coef[0];
+      s1 += X[1] * coef[1];
+      s2 += X[2] * coef[2];
+      s3 += X[3] * coef[3];
+      X += 4;
+      coef += 4;
+    }
+    return s0 + s1 + s2 + s3;
+  }
+}
+
+double dlcx2( size_t n, const double *X, const double *coef, double intercept )
+{
+  double s0 = intercept, s1 = 0.0;
+  if (n % 2)
+  {
+    for ( size_t j = (n >> 1); j > 0; j-- )
+    {
+      s0 += X[0] * coef[0];
+      s1 += X[1] * coef[1];
+      X += 2;
+      coef += 2;
+    }
+    return s0 + s1 + (X[0] * coef[0]);
+  }
+  else
+  {
+    for ( size_t j = (n >> 1); j > 0; j-- )
+    {
+      s0 += X[0] * coef[0];
+      s1 += X[1] * coef[1];
+      X += 2;
+      coef += 2;
+    }
+    return s0 + s1;
+  }
+  
+}
+
 // Compute z = w * x + b
-double dlc( unsigned long n, double *X, double *coef, double intercept )
+double dlc( size_t n, const double *X, const double *coef, double intercept )
 {
     double z = intercept;
-    for ( unsigned long j = 0; j < n; j++ )
+    for ( size_t j = 0; j < n; j++ )
     {
         z += X[j] * coef[j];
     }
@@ -72,16 +131,10 @@ double dlc( unsigned long n, double *X, double *coef, double intercept )
 }
 
 // Compute y_hat = 1 / (1 + e^(-(w * x + b)))
-double dsigmoid( unsigned long n, double alpha, double *X, double *coef, double beta, double intercept )
+double dsigmoid( size_t n, const double *X, double *coef, double intercept )
 {
-    //double z = intercept;
-    //bli_ddotxv( BLIS_NO_CONJUGATE, BLIS_NO_CONJUGATE, n, &alpha, X, 1, coef, 1, &beta, &z );
-    double z = intercept;
-    for ( unsigned long j = 0; j < n; j++ )
-    {
-        z += X[j] * coef[j];
-    }
-
+    double z = dlcx4( n, X, coef, intercept );
+    
     if ( z >= 0)
     {
       return 1.0 / (1.0 + exp(-z));
@@ -92,3 +145,22 @@ double dsigmoid( unsigned long n, double alpha, double *X, double *coef, double 
       return z / (1.0 + z);
     }
 }
+
+/*
+// Compute y_hat = 1 / (1 + e^(-(w * x + b)))
+double dsigmoid( size_t n, double alpha, const double *X, double *coef, double beta, double intercept )
+{
+    double z = intercept;
+    bli_ddotxv( BLIS_NO_CONJUGATE, BLIS_NO_CONJUGATE, n, &alpha, X, 1, coef, 1, &beta, &z );
+    
+    if ( z >= 0)
+    {
+      return 1.0 / (1.0 + exp(-z));
+    }
+    else
+    {
+      z = exp(z);
+      return z / (1.0 + z);
+    }
+}
+*/

@@ -6,27 +6,27 @@
 #include "gd.h"
 #include "utils.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
     double *X, *y, *coef, *y_preds;
     double intercept, eta;
     double alpha = 1.0, beta = 1.0;
     unsigned long m = 100000;
     unsigned long n = 20;
-    int max_iter = 250;
+    int max_iter;
 
     int class_0 = (unsigned long)(3.0 / 4.0 * (double)m);
     double pct_class_1 = 0.0;
 
-    int stochastic = 0;
-
-    if ( stochastic == 1 )
+    if ( *argv[1] == '1' )
     {
         eta = 0.05;
+        max_iter = 150;
     }
     else
     {
         eta = 0.5;
+        max_iter = 250;
     }
 
     clock_t test_start;
@@ -84,15 +84,22 @@ int main(void)
         */
     }
 
-    // Fit weights
-    printf("Running GD/SGD...\n");
-    test_start = clock();
-    if ( stochastic == 1 )
+    for ( unsigned long j = 0; j < n; j++ )
     {
+        coef[j] = 0.0;
+    }
+    intercept = 0.0;
+
+    // Fit weights
+    test_start = clock();
+    if ( *argv[1] == '1' )
+    {
+        printf("Running SGD...\n");
         dsgd( m, n, X, y, coef, &intercept, eta, max_iter, 1, -1 );
     }
     else
     {
+        printf("Running GD...\n");
         dgd( m, n, X, y, coef, &intercept, eta, max_iter, 1 );
     }
     test_end = clock();
@@ -103,7 +110,7 @@ int main(void)
     printf("Making predictions...\n");
     for ( unsigned long i = 0; i < m; i++ )
     {
-        y_preds[i] = dsigmoid( n, alpha, &X[i*n], coef, beta, intercept );
+        y_preds[i] = dsigmoid( n, &X[i*n], coef, intercept );
     }
 
     printf("Printing results...\n");
