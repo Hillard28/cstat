@@ -3,7 +3,7 @@ from Cython.Build import cythonize
 
 name="cstat"
 sources=["cstat.pyx", "gd.c", "sgd.c", "utils.c"]
-extensions = Extension(name, sources, extra_compile_args=["-O3", "-ffast-math", "-march=native"])
+extensions = Extension(name, sources, extra_compile_args=["-O3", "-funsafe-math-optimizations", "-march=native"])
 
 setup(ext_modules = cythonize(
      extensions,
