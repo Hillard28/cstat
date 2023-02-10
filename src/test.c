@@ -10,13 +10,14 @@ int main(int argc, char **argv)
 {
     double *X, *y, *coef, *y_preds;
     double intercept, eta;
-    double alpha = 1.0, beta = 1.0;
+    //double alpha = 1.0, beta = 1.0;
     unsigned long m = 100000;
-    unsigned long n = 20;
+    unsigned long n = 200;
     int max_iter;
 
     int class_0 = (unsigned long)(3.0 / 4.0 * (double)m);
     double pct_class_1 = 0.0;
+    int n_odd = n % 2;
 
     if ( *argv[1] == '1' )
     {
@@ -110,7 +111,8 @@ int main(int argc, char **argv)
     printf("Making predictions...\n");
     for ( unsigned long i = 0; i < m; i++ )
     {
-        y_preds[i] = dsigmoid( n, &X[i*n], coef, intercept );
+        y_preds[i] = dsigmoid( n, &X[i*n], coef, intercept, n_odd );
+        //y_preds[i] = dsigmoid( n, alpha, &X[n*i], coef, beta, intercept );
     }
 
     printf("Printing results...\n");
