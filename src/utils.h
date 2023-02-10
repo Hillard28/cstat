@@ -18,12 +18,10 @@ double genRand(MTRand* rand);
 
 double dlc( size_t n, const double *X, const double *coef, double intercept );
 
-double dlcx2( size_t n, const double *X, const double *coef, double intercept );
-
-double dlcx4( size_t n, const double *X, const double *coef, double intercept );
+double dlcx2( size_t n, const double *X, const double *coef, double intercept, int n_odd );
 
 //double dsigmoid( size_t n, double alpha, const double *X, double *coef, double beta, double intercept );
 
-double dsigmoid( size_t n, const double *X, double *coef, double intercept );
+double dsigmoid( size_t n, const double *X, double *coef, double intercept, int n_odd );
 
 #endif
