@@ -1,18 +1,26 @@
+#include <math.h>
 #include <time.h>
 #include "utils.h"
+//#include "blis.h"
 
 // Stochastic gradient descent
-void dsgd( size_t m, size_t n, const double *X, const double *y, double *coef, double *intercept, double eta, int max_iter, int fit_intercept, int random_seed )
+void dsgd( unsigned long m, unsigned long n, double *X, double *y, double *coef, double *intercept, double eta, int max_iter, int fit_intercept, int random_seed )
 {
-    int n_odd = n % 2;
-
-    double *gradient_coef = calloc (n, sizeof(double));
-    
-    double resid;
-    //double alpha=1.0, beta=0.0;
-    size_t idx;
+    double *gradient_coef;
+    double y_pred, resid;
+    unsigned long idx;
     MTRand seed;
-    double y_hat;
+    double alpha = 1.0, beta = 1.0;
+
+    gradient_coef = (double *) malloc (n * sizeof(double));
+    
+    for ( unsigned long i = 0; i < n; i++ )
+    {
+        coef[i] = 0.0;
+        gradient_coef[i] = 0.0;
+    }
+    *intercept = 0.0;
+    
 
     if (random_seed < 0)
     {
@@ -25,16 +33,16 @@ void dsgd( size_t m, size_t n, const double *X, const double *y, double *coef, d
     
     for ( int epoch = 0; epoch < max_iter; epoch++ )
     {
-        for ( size_t run = 0; run < m; run++ )
+        for ( unsigned long run = 0; run < m; run++ )
         {
             // Randomly sample an observation
             idx = genRandLong(&seed) % m;
             
-            //y_hat = dsigmoid( n, alpha, &X[n*idx], coef, beta, *intercept );
-            y_hat = dsigmoid( n, &X[n*idx], coef, *intercept, n_odd );
-            resid = -(y[idx] - y_hat);
+            // Compute y_hat
+            y_pred = dsigmoid( n, alpha, &X[n*idx], coef, beta, *intercept );
+            resid = -(y[idx] - y_pred);
             // Compute gradients and adjust weights
-            for ( size_t i = 0; i < n; i++ )
+            for ( unsigned long i = 0; i < n; i++ )
             {
                 gradient_coef[i] = X[n*idx + i] * resid;
                 coef[i] -= eta * gradient_coef[i];
@@ -45,5 +53,4 @@ void dsgd( size_t m, size_t n, const double *X, const double *y, double *coef, d
             }
         }
     }
-    free(gradient_coef);
 }
