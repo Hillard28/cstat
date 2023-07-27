@@ -16,13 +16,11 @@ unsigned long genRandLong(MTRand* rand);
 
 double genRand(MTRand* rand);
 
-double dlc( size_t n, const double *X, const double *coef, double intercept );
+// Compute z = w * x + b
+double dlc( unsigned long n, double *X, double *coef, double intercept );
 
-double dlcx2( size_t n, const double *X, const double *coef, double intercept, int n_odd );
-
-//double dsigmoid( size_t n, double alpha, const double *X, double *coef, double beta, double intercept );
-
-double dsigmoid( size_t n, const double *X, double *coef, double intercept, int n_odd );
+// Compute y_hat = 1 / (1 + e^(-z))
+double dsigmoid( unsigned long n, double alpha, double *X, double *coef, double beta, double intercept );
 
 // Function to swap two elements in the array
 void swap(int* a, int* b);
